@@ -2,17 +2,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
+import java.sql.*;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.io.InputStream;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -111,7 +106,6 @@ public class DBAccessor {
 				}
 			}
 		}
-
 		return conn;
 	}
 
@@ -155,18 +149,40 @@ public class DBAccessor {
 	}
 
 
-	public void altaArticle() throws SQLException, NumberFormatException, IOException, ParseException {
-
+	public void altaArticle() throws SQLException, NumberFormatException {
 		// TODO demana per consola els valors dels diferents atributs
 		// d'article, excepte aquells que poden ser nuls , i realitza la
 		// inserció d'un registre
 
+		Scanner reader = new Scanner(System.in);
+		System.out.println("Introdueix el id de l'article");
+		int id = reader.nextInt();
+		System.out.println("Introdueix el id de l'autor de l'article");
+		int autor = reader.nextInt();
+		System.out.println("Introdueix el titol");
+		reader.nextLine();
+		String titol = reader.nextLine();
+		System.out.println("Introdueix la data de creació (yyyy-mm-dd)");
+		Date data_creacio = java.sql.Date.valueOf(reader.nextLine());
+		System.out.println("Es publicable? (S/N)");
+		String publicable = reader.nextLine();
 
-		
+		String sql = "INSERT INTO articles (id_article, id_autor, titol, data_creacio, publicable, id_revista) VALUES (?,?,?,?,?)";
+		PreparedStatement pst = conn.prepareStatement(sql);
+
+		pst.clearParameters();
+		pst.setInt(1,id);
+		pst.setInt(2,autor);
+		pst.setString(3,titol);
+		pst.setDate(4, (java.sql.Date) data_creacio);
+		pst.setString(5,publicable);
+
+		pst.executeUpdate();
+
+		conn.commit();
 	}
 	
 	public void afegeixArticleARevista(Connection conn) throws SQLException {
-
 		ResultSet rs = null;
 		Statement st = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 		InputStreamReader isr = new InputStreamReader(System.in);
@@ -214,14 +230,11 @@ public class DBAccessor {
 		// demanar el nou títol per la revista
 		// actualitzar el camp
 		// actualitzar la fila
-		
-	
 	}
 	
 
 	// TODO
 	public void desassignaArticleARevista(Connection conn) throws SQLException, IOException {
-
 		// TODO
 		// seguint l'exemple de la funció afegeixArticleARevista:
 		// definir variables locals
@@ -236,11 +249,8 @@ public class DBAccessor {
 		// actualitzar el camp corresponent a null
 		// actualitzar la fila
 		// en altre cas imprimir "operació cancel·lada"
-
-		
 	}
 
-	
 	public void mostraAutors() throws SQLException, IOException {
 		Statement st = conn.createStatement();
 		Scanner reader = new Scanner(System.in);
@@ -252,7 +262,6 @@ public class DBAccessor {
 		st.close();
 	}
 
-	
 	public void mostraRevistes() throws SQLException, IOException {
 		Statement st = conn.createStatement();
 		Scanner reader = new Scanner(System.in);
@@ -264,7 +273,6 @@ public class DBAccessor {
 		st.close();
 	}
 
-	
 	public void mostraRevistesArticlesAutors() throws SQLException, IOException {
 		Statement st = conn.createStatement();
 		Scanner reader = new Scanner(System.in);
@@ -274,7 +282,6 @@ public class DBAccessor {
 		while (rs.next()) System.out.println("Nom autor: " +rs.getString(1) + "\tNomRevista: " + rs.getString(2) + "\tNom article: " + rs.getString(3));
 		rs.close();
 		st.close();
-
 	}
 
 	public void sortir() throws SQLException {
@@ -288,7 +295,5 @@ public class DBAccessor {
 		// mitjançant Prepared Statement
 		// per a cada línia del fitxer autors.csv
 		//realitzar la inserció corresponent
-
-		
 	}
 }
